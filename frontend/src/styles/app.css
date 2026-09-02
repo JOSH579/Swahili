@@ -1,0 +1,113 @@
+:root {
+  color-scheme: light;
+  --bg: #f4efe6;
+  --ink: #1c1915;
+  --muted: #5c564c;
+  --card: #fffcf7;
+  --line: #d9d0c3;
+  --accent: #0f6b4c;
+  --accent-ink: #ffffff;
+  --danger: #9b2c2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(440px, 100%);
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.lede {
+  margin: 0 0 24px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+button {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.banner,
+.field-error {
+  margin: 0;
+  color: var(--danger);
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+}
