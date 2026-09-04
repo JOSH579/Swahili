@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { setToken } from "../api.js";
 
 const EMPTY_FORM = {
   name: "",
@@ -7,12 +8,11 @@ const EMPTY_FORM = {
   password_confirmation: "",
 };
 
-export default function RegisterPage({ onGoToLogin }) {
+export default function RegisterPage({ onGoToLogin, onSuccess }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdUser, setCreatedUser] = useState(null);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -47,9 +47,8 @@ export default function RegisterPage({ onGoToLogin }) {
         setFormError(payload.message ?? "Registration failed. Try again.");
         return;
       }
-      localStorage.setItem('token', payload.token);
-      setCreatedUser(payload.user);
-      setForm(EMPTY_FORM);
+      setToken(payload.token);
+      onSuccess(payload.user);
     } catch {
       setFormError("Could not reach the server. Is Laravel running?");
     } finally {
@@ -57,24 +56,7 @@ export default function RegisterPage({ onGoToLogin }) {
     }
   }
 
-  if (createdUser) {
-    return (
-      <main className="page">
-        <section className="card">
-          <p className="eyebrow">Karibu</p>
-          <h1>Account created</h1>
-          <p className="lede">
-            You registered as <strong>{createdUser.name}</strong> ({createdUser.email}).
-            Your role is <strong>{createdUser.role}</strong>. Login comes next.
-          </p>
-          <button type="button" onClick={onGoToLogin}>
-            Go to login
-          </button>
-        </section>
-      </main>
-    );
-  }
-
+  
   return (
     <main className="page">
       <section className="card">

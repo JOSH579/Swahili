@@ -1,16 +1,16 @@
 import { useState } from "react";
+import { setToken } from "../api.js";
 
 const EMPTY_FORM = {
   email: "",
   password: "",
 };
 
-export default function LoginPage({ onGoToRegister }) {
+export default function LoginPage({ onGoToRegister, onSuccess }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -46,9 +46,8 @@ export default function LoginPage({ onGoToRegister }) {
         return;
       }
 
-      localStorage.setItem("token", payload.token);
-      setLoggedInUser(payload.user);
-      setForm(EMPTY_FORM);
+      setToken(payload.token);
+      onSuccess(payload.user);
     } catch {
       setFormError("Could not reach the server. Is Laravel running?");
     } finally {
@@ -56,19 +55,6 @@ export default function LoginPage({ onGoToRegister }) {
     }
   }
 
-  if (loggedInUser) {
-    return (
-      <main className="page">
-        <section className="card">
-          <p className="eyebrow">Karibu tena</p>
-          <h1>You are logged in</h1>
-          <p className="lede">
-            Welcome back, <strong>{loggedInUser.name}</strong>. Lessons come next.
-          </p>
-        </section>
-      </main>
-    );
-  }
 
   return (
     <main className="page">
