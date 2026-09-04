@@ -1,18 +1,16 @@
 import { useState } from "react";
 
 const EMPTY_FORM = {
-  name: "",
   email: "",
   password: "",
-  password_confirmation: "",
 };
 
-export default function RegisterPage({ onGoToLogin }) {
+export default function LoginPage({ onGoToRegister }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdUser, setCreatedUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -26,7 +24,7 @@ export default function RegisterPage({ onGoToLogin }) {
     setFormError("");
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,11 +42,12 @@ export default function RegisterPage({ onGoToLogin }) {
       }
 
       if (!response.ok) {
-        setFormError(payload.message ?? "Registration failed. Try again.");
+        setFormError(payload.message ?? "Login failed. Try again.");
         return;
       }
-      localStorage.setItem('token', payload.token);
-      setCreatedUser(payload.user);
+
+      localStorage.setItem("token", payload.token);
+      setLoggedInUser(payload.user);
       setForm(EMPTY_FORM);
     } catch {
       setFormError("Could not reach the server. Is Laravel running?");
@@ -57,19 +56,15 @@ export default function RegisterPage({ onGoToLogin }) {
     }
   }
 
-  if (createdUser) {
+  if (loggedInUser) {
     return (
       <main className="page">
         <section className="card">
-          <p className="eyebrow">Karibu</p>
-          <h1>Account created</h1>
+          <p className="eyebrow">Karibu tena</p>
+          <h1>You are logged in</h1>
           <p className="lede">
-            You registered as <strong>{createdUser.name}</strong> ({createdUser.email}).
-            Your role is <strong>{createdUser.role}</strong>. Login comes next.
+            Welcome back, <strong>{loggedInUser.name}</strong>. Lessons come next.
           </p>
-          <button type="button" onClick={onGoToLogin}>
-            Go to login
-          </button>
         </section>
       </main>
     );
@@ -79,26 +74,11 @@ export default function RegisterPage({ onGoToLogin }) {
     <main className="page">
       <section className="card">
         <p className="eyebrow">Swahili for foreigners</p>
-        <h1>Create your account</h1>
-        <p className="lede">
-          New learners start as students. You will use this account to open lessons
-          later.
-        </p>
+        <h1>Log in</h1>
+        <p className="lede">Use the email and password you registered with.</p>
 
         <form onSubmit={handleSubmit} noValidate>
           {formError ? <p className="banner">{formError}</p> : null}
-
-          <label>
-            Full name
-            <input
-              name="name"
-              type="text"
-              autoComplete="name"
-              value={form.name}
-              onChange={updateField}
-            />
-            {errors.name ? <span className="field-error">{errors.name[0]}</span> : null}
-          </label>
 
           <label>
             Email
@@ -117,37 +97,24 @@ export default function RegisterPage({ onGoToLogin }) {
             <input
               name="password"
               type="password"
-              autoComplete="new-password"
+              autoComplete="current-password"
               value={form.password}
               onChange={updateField}
             />
             {errors.password ? (
               <span className="field-error">{errors.password[0]}</span>
-            ) : (
-              <span className="hint">At least 8 characters.</span>
-            )}
-          </label>
-
-          <label>
-            Confirm password
-            <input
-              name="password_confirmation"
-              type="password"
-              autoComplete="new-password"
-              value={form.password_confirmation}
-              onChange={updateField}
-            />
+            ) : null}
           </label>
 
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating account…" : "Create account"}
+            {isSubmitting ? "Logging in…" : "Log in"}
           </button>
         </form>
 
         <p className="switch">
-          Already have an account?{" "}
-          <button type="button" className="link" onClick={onGoToLogin}>
-            Log in
+          New here?{" "}
+          <button type="button" className="link" onClick={onGoToRegister}>
+            Create an account
           </button>
         </p>
       </section>

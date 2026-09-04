@@ -111,3 +111,20 @@ button:disabled {
   color: var(--muted);
   font-size: 12px;
 }
+
+.switch {
+  margin: 16px 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+button.link {
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
