@@ -333,3 +333,30 @@ button.secondary {
   font-family: system-ui, sans-serif;
   font-size: 14px;
 }
+
+.choice-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.choice-btn {
+  margin: 0;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.choice-btn.correct {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+.choice-btn.wrong {
+  background: #f8e6e6;
+  color: var(--danger);
+  border-color: var(--danger);
+}
