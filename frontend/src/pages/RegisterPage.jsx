@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { setToken } from "../api.js";
+import GuestNav from "../components/GuestNav.jsx";
 
 const EMPTY_FORM = {
   name: "",
@@ -8,7 +9,7 @@ const EMPTY_FORM = {
   password_confirmation: "",
 };
 
-export default function RegisterPage({ onGoToLogin, onSuccess }) {
+export default function RegisterPage({ onGoToLogin, onGoToLanding, onSuccess, navOpen, onToggleNav }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -58,7 +59,18 @@ export default function RegisterPage({ onGoToLogin, onSuccess }) {
 
   
   return (
-    <main className="page">
+    <div className="page page-guest">
+      <GuestNav
+        current="register"
+        open={navOpen}
+        onToggle={onToggleNav}
+        onGoHome={onGoToLanding}
+        onGoToLogin={onGoToLogin}
+        onGoToRegister={() => {}}
+      />
+
+      <div className="page-main">
+      <main className="page-main">
       <section className="card">
         <p className="eyebrow">Swahili for foreigners</p>
         <h1>Create your account</h1>
@@ -126,13 +138,9 @@ export default function RegisterPage({ onGoToLogin, onSuccess }) {
           </button>
         </form>
 
-        <p className="switch">
-          Already have an account?{" "}
-          <button type="button" className="link" onClick={onGoToLogin}>
-            Log in
-          </button>
-        </p>
       </section>
-    </main>
+      </main>
+    </div>
+    </div>
   );
 }

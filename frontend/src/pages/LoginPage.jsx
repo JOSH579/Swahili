@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GuestNav from "../components/GuestNav.jsx";
 import { setToken } from "../api.js";
 
 const EMPTY_FORM = {
@@ -6,7 +7,7 @@ const EMPTY_FORM = {
   password: "",
 };
 
-export default function LoginPage({ onGoToRegister, onSuccess }) {
+export default function LoginPage({ onGoToRegister, onGoToLanding, onGoToLogin, onSuccess, navOpen, onToggleNav }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -57,53 +58,56 @@ export default function LoginPage({ onGoToRegister, onSuccess }) {
 
 
   return (
-    <main className="page">
-      <section className="card">
-        <p className="eyebrow">Swahili for foreigners</p>
-        <h1>Log in</h1>
-        <p className="lede">Use the email and password you registered with.</p>
+    <div className="page page-guest">
+      <GuestNav
+        current="login"
+        open={navOpen}
+        onToggle={onToggleNav}
+        onGoHome={onGoToLanding}
+        onGoToLogin={onGoToLogin}
+        onGoToRegister={onGoToRegister}
+      />
+      <div className="page-main">
+        <section className="card">
+          <p className="eyebrow">Swahili for foreigners</p>
+          <h1>Log in</h1>
+          <p className="lede">Use the email and password you registered with.</p>
 
-        <form onSubmit={handleSubmit} noValidate>
-          {formError ? <p className="banner">{formError}</p> : null}
+          <form onSubmit={handleSubmit} noValidate>
+            {formError ? <p className="banner">{formError}</p> : null}
 
-          <label>
-            Email
-            <input
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={form.email}
-              onChange={updateField}
-            />
-            {errors.email ? <span className="field-error">{errors.email[0]}</span> : null}
-          </label>
+            <label>
+              Email
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={form.email}
+                onChange={updateField}
+              />
+              {errors.email ? <span className="field-error">{errors.email[0]}</span> : null}
+            </label>
 
-          <label>
-            Password
-            <input
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              value={form.password}
-              onChange={updateField}
-            />
-            {errors.password ? (
-              <span className="field-error">{errors.password[0]}</span>
-            ) : null}
-          </label>
+            <label>
+              Password
+              <input
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                value={form.password}
+                onChange={updateField}
+              />
+              {errors.password ? (
+                <span className="field-error">{errors.password[0]}</span>
+              ) : null}
+            </label>
 
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Logging in…" : "Log in"}
-          </button>
-        </form>
-
-        <p className="switch">
-          New here?{" "}
-          <button type="button" className="link" onClick={onGoToRegister}>
-            Create an account
-          </button>
-        </p>
-      </section>
-    </main>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in…" : "Log in"}
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
   );
 }
