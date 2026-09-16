@@ -38,4 +38,29 @@ class LessonController extends Controller
             ],
         ]);
     }
+
+    public function quiz(Lesson $lesson): JsonResponse
+    {
+        $words = $lesson->vocabItems()->orderBy('sort_order')->get();
+
+        $questions = $words->shuffle()->map(function ($word) use ($words) {
+            $wrong = $words->where('id', '!=', $word->id)->shuffle()->take(3);
+            $options = $wrong->pluck('swahili')->push($word->swahili)->shuffle()->values();
+
+            return [
+                'id' => $word->id,
+                'prompt' => $word->english,
+                'options' => $options,
+                'answer' => $word->swahili,
+            ];
+        })->values();
+
+        return response()->json([
+            'quiz' => [
+                'lesson_id' => $lesson->id,
+                'title' => $lesson->title,
+                'questions' => $questions,
+            ],
+        ]);
+    }
 }

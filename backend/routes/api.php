@@ -13,5 +13,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [MeController::class, 'show']);
     Route::post('/logout', [MeController::class, 'destroy']);
     Route::get('/lessons', [LessonController::class, 'index']);
+    Route::get('/lessons/{lesson}/quiz', [LessonController::class, 'quiz']);
     Route::get('/lessons/{lesson}', [LessonController::class, 'show']);
 });

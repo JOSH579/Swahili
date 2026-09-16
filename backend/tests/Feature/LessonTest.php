@@ -45,4 +45,28 @@ class LessonTest extends TestCase
             ->assertJsonPath('lesson.words.0.swahili', 'Hujambo')
             ->assertJsonPath('lesson.words.0.english', 'Hello');
     }
+
+    public function test_quiz_requires_a_token(): void
+    {
+        $this->getJson('/api/lessons/1/quiz')->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_take_a_quiz(): void
+    {
+        $this->seed(LessonSeeder::class);
+
+        $user = User::factory()->create();
+        $token = $user->createToken('web')->plainTextToken;
+
+        $response = $this->getJson('/api/lessons/1/quiz', [
+            'Authorization' => "Bearer {$token}",
+        ])->assertOk();
+
+        $response->assertJsonCount(9, 'quiz.questions');
+
+        $question = $response->json('quiz.questions.0');
+
+        $this->assertCount(4, $question['options']);
+        $this->assertContains($question['answer'], $question['options']);
+    }
 }

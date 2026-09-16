@@ -5,6 +5,7 @@ import { apiFetch } from "../api.js";
 export default function LessonPage({
   lessonId,
   onBack,
+  onStartQuiz,
   navOpen,
   onToggleNav,
   onLogout,
@@ -53,9 +54,14 @@ export default function LessonPage({
                   </li>
                 ))}
               </ul>
-              <button type="button" onClick={onBack}>
-                Back to lessons
-              </button>
+              <div className="actions">
+                <button type="button" onClick={onStartQuiz}>
+                  Take quiz
+                </button>
+                <button type="button" className="secondary" onClick={onBack}>
+                  Back to lessons
+                </button>
+              </div>
             </>
           ) : null}
         </section>

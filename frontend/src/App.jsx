@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 import LessonPage from "./pages/LessonPage.jsx";
+import QuizPage from "./pages/QuizPage.jsx";
 
 export default function App() {
   const [page, setPage] = useState("landing");
@@ -12,6 +13,7 @@ export default function App() {
   const [isCheckingToken, setIsCheckingToken] = useState(Boolean(getToken()));
   const [navOpen, setNavOpen] = useState(false);
   const [lessonId, setLessonId] = useState(null);
+  const [takingQuiz, setTakingQuiz] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -39,6 +41,7 @@ export default function App() {
     clearToken();
     setUser(null);
     setLessonId(null);
+    setTakingQuiz(false);
     setPage("landing");
   }
 
@@ -52,11 +55,28 @@ export default function App() {
     );
   }
 
+  if (user && lessonId && takingQuiz) {
+    return (
+      <QuizPage
+        lessonId={lessonId}
+        onBack={() => setTakingQuiz(false)}
+        onGoHome={() => {
+          setTakingQuiz(false);
+          setLessonId(null);
+        }}
+        navOpen={navOpen}
+        onToggleNav={() => setNavOpen((open) => !open)}
+        onLogout={handleLogout}
+      />
+    );
+  }
+  
   if (user && lessonId) {
     return (
       <LessonPage
         lessonId={lessonId}
         onBack={() => setLessonId(null)}
+        onStartQuiz={() => setTakingQuiz(true)}
         navOpen={navOpen}
         onToggleNav={() => setNavOpen((open) => !open)}
         onLogout={handleLogout}
