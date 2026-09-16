@@ -29,6 +29,16 @@ body {
   padding: 24px;
 }
 
+.page-guest {
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: row;
+  padding: 0;
+  background:
+    radial-gradient(circle at top left, #e7f0e4 0, transparent 42%),
+    var(--bg);
+}
+
 .card {
   width: min(440px, 100%);
   background: var(--card);
@@ -127,4 +137,199 @@ button.link {
   font: inherit;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.brand {
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+span.brand {
+  cursor: default;
+}
+
+.nav-btn.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.page-guest .card {
+  flex: none;
+  width: min(440px, 100%);
+  margin: 0;
+}
+
+.landing {
+  flex: none;
+  width: min(880px, 100%);
+  margin: 0;
+  padding-top: 0;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.15;
+  max-width: 18ch;
+}
+
+.hero .lede {
+  max-width: 42em;
+  font-size: 18px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actions button {
+  margin-top: 0;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.preview-panel,
+.highlight {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 20px;
+}
+
+.preview-heading {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.preview-grid {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.preview-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.preview-swahili {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.preview-english {
+  margin: 0;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.highlight h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.highlight p {
+  margin: 0;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.sidebar {
+  flex-shrink: 0;
+  width: 72px;
+  min-height: 100vh;
+  padding: 12px;
+  border-right: 1px solid var(--line);
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar.open {
+  width: 220px;
+}
+
+.nav-toggle {
+  margin: 0;
+  width: 100%;
+  padding: 10px 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 13px;
+}
+
+.sidebar .brand {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.sidebar .site-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar .nav-btn {
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.page-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.lesson-list,
+.word-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.lesson-row,
+.word-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.word-row span {
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
 }
