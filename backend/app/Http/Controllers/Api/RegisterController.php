@@ -23,12 +23,7 @@ class RegisterController extends Controller
         return response()->json([
             'message' => 'Account created.',
             'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-            ],
+            'user' => $user->toApiArray(),
         ], 201);
     }
 }

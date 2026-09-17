@@ -22,11 +22,16 @@ class User extends Authenticatable
      */
 
     public const ROLE_STUDENT = 'student';
+    public const PLACEMENT_STARTER = 'starter';
+    public const PLACEMENT_SURVIVAL = 'survival';
+    public const PLACEMENT_BEYOND = 'beyond';
 
     public const ROLE_ADMIN = 'admin';
 
     protected $fillable = [
         'name',
+        'placement',
+        'onboarded_at',
         'email',
         'password',
         'role',
@@ -50,8 +55,21 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'onboarded_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
+
+    public function toApiArray(): array
+{
+    return [
+        'id' => $this->id,
+        'name' => $this->name,
+        'email' => $this->email,
+        'role' => $this->role,
+        'placement' => $this->placement,
+        'onboarded_at' => $this->onboarded_at?->toIso8601String(),
+    ];
+}
 }

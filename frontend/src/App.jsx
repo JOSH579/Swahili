@@ -6,6 +6,8 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 import LessonPage from "./pages/LessonPage.jsx";
 import QuizPage from "./pages/QuizPage.jsx";
+import PlacementPage from "./pages/PlacementPage.jsx";
+
 
 export default function App() {
   const [page, setPage] = useState("landing");
@@ -52,6 +54,18 @@ export default function App() {
           <p className="lede">Checking your session…</p>
         </section>
       </main>
+    );
+  }
+
+  if (user && !user.onboarded_at) {
+    return (
+      <PlacementPage
+        user={user}
+        onComplete={setUser}
+        navOpen={navOpen}
+        onToggleNav={() => setNavOpen((open) => !open)}
+        onLogout={handleLogout}
+      />
     );
   }
 
