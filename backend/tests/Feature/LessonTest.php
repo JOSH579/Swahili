@@ -20,15 +20,18 @@ class LessonTest extends TestCase
     {
         $this->seed(LessonSeeder::class);
 
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'placement' => User::PLACEMENT_STARTER,
+        ]);
         $token = $user->createToken('web')->plainTextToken;
 
         $this->getJson('/api/lessons', [
             'Authorization' => "Bearer {$token}",
         ])
             ->assertOk()
-            ->assertJsonPath('lessons.0.title', 'Greetings')
-            ->assertJsonPath('lessons.0.word_count', 9);
+            ->assertJsonPath('up_next.0.title', 'Greetings')
+            ->assertJsonPath('up_next.0.word_count', 9)
+            ->assertJsonCount(0, 'review');
     }
 
     public function test_authenticated_user_can_view_a_lesson(): void
@@ -68,5 +71,22 @@ class LessonTest extends TestCase
 
         $this->assertCount(4, $question['options']);
         $this->assertContains($question['answer'], $question['options']);
+    }
+
+    public function test_survival_user_sees_greetings_as_review(): void
+    {
+        $this->seed(LessonSeeder::class);
+
+        $user = User::factory()->create([
+            'placement' => User::PLACEMENT_SURVIVAL,
+        ]);
+        $token = $user->createToken('web')->plainTextToken;
+
+        $this->getJson('/api/lessons', [
+            'Authorization' => "Bearer {$token}",
+        ])
+            ->assertOk()
+            ->assertJsonCount(0, 'up_next')
+            ->assertJsonPath('review.0.title', 'Greetings');
     }
 }

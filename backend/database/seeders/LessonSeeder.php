@@ -13,6 +13,7 @@ class LessonSeeder extends Seeder
             ['slug' => 'greetings'],
             [
                 'title' => 'Greetings',
+                'stage' => 'starter',
                 'description' => 'Useful words for saying hello and being polite.',
             ]
         );

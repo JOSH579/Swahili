@@ -9,6 +9,7 @@ class Lesson extends Model
 {
     protected $fillable = [
         'title',
+        'stage',
         'slug',
         'description',
     ];
