@@ -166,10 +166,17 @@ span.brand {
 }
 
 .landing {
-  flex: none;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  gap: 24px;
+  padding: 48px 24px 64px;
+}
+
+.landing > * {
   width: min(880px, 100%);
-  margin: 0;
-  padding-top: 0;
 }
 
 .hero h1 {
