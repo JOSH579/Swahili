@@ -70,7 +70,6 @@ export default function RegisterPage({ onGoToLogin, onGoToLanding, onSuccess, na
       />
 
       <div className="page-main">
-      <main className="page-main">
       <section className="card">
         <p className="eyebrow">Swahili for foreigners</p>
         <h1>Create your account</h1>
@@ -139,7 +138,6 @@ export default function RegisterPage({ onGoToLogin, onGoToLanding, onSuccess, na
         </form>
 
       </section>
-      </main>
     </div>
     </div>
   );

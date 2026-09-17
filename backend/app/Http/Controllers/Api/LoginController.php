@@ -26,12 +26,7 @@ class LoginController extends Controller
         return response()->json([
             'message' => 'Logged in.',
             'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-            ],
+            'user' => $user->toApiArray(),
         ]);
     }
 }
