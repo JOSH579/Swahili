@@ -55,7 +55,7 @@ export default function LandingPage({ onGoToRegister,  onGoToLogin, onGoToLandin
           <h2 id="preview-heading" className="preview-heading">
             Peek at the Greetings lesson
           </h2>
-          <p className="hint">Three of ten words. Sign in for the full set.</p>
+          <p className="hint">Three of nine Greetings words. Sign in for the full set.</p>
           <ul className="preview-grid">
             {PREVIEW_WORDS.map((word) => (
               <li key={word.swahili} className="preview-card">

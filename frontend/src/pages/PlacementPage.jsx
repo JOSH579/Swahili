@@ -97,7 +97,7 @@ export default function PlacementPage({
   return (
     <div className="page page-guest">
       <GuestNav
-        current="home"
+        current="landing"
         open={navOpen}
         onToggle={onToggleNav}
         onGoHome={() => {}}
