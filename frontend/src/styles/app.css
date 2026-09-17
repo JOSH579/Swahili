@@ -367,3 +367,7 @@ button.secondary {
   color: var(--danger);
   border-color: var(--danger);
 }
+
+.card .preview-heading {
+  margin: 20px 0 8px;
+}

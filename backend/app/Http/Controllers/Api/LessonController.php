@@ -4,19 +4,42 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class LessonController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $lessons = Lesson::query()
             ->withCount('vocabItems as word_count')
             ->orderBy('id')
-            ->get(['id', 'title', 'slug', 'description']);
+            ->get(['id', 'title', 'slug', 'description', 'stage']);
+
+        $rank = [
+            'starter' => 1,
+            'survival' => 2,
+            'beyond' => 3,
+        ];
+
+        $userRank = $rank[$request->user()->placement] ?? 1;
+
+        $upNext = [];
+        $review = [];
+
+        foreach ($lessons as $lesson) {
+            $lessonRank = $rank[$lesson->stage] ?? 1;
+
+            if ($lessonRank < $userRank) {
+                $review[] = $lesson;
+            } elseif ($lessonRank === $userRank) {
+                $upNext[] = $lesson;
+            }
+        }
 
         return response()->json([
-            'lessons' => $lessons,
+            'up_next' => $upNext,
+            'review' => $review,
         ]);
     }
 
