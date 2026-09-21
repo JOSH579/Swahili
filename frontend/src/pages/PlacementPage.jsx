@@ -8,6 +8,27 @@ const SELF_LEVELS = [
   { id: "lots", label: "I can hold a simple conversation" },
 ];
 
+const STAGE_COPY = {
+  starter: {
+    title: "Starter",
+    lede: "Begin with Greetings. That is the right floor for now.",
+  },
+  survival: {
+    title: "Survival",
+    lede: "You know the basics. Greetings will sit under Review until the next unit is ready.",
+  },
+  beyond: {
+    title: "Beyond greetings",
+    lede: "You handled the harder checks. You can start here, or step down if you want more practice.",
+  },
+};
+
+const LOWER_STAGES = {
+  starter: [],
+  survival: ["starter"],
+  beyond: ["survival", "starter"],
+};
+
 export default function PlacementPage({
   user,
   onComplete,
@@ -19,11 +40,18 @@ export default function PlacementPage({
   const [error, setError] = useState("");
   const [selfLevel, setSelfLevel] = useState(null);
   const [index, setIndex] = useState(0);
-  const [picked, setPicked] = useState(null);
+  const [picked, setPicked] = useState("");
   const [checks, setChecks] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const suggested = user.placement;
+  const showingResult = Boolean(suggested);
+
   useEffect(() => {
+    if (showingResult) {
+      return;
+    }
+
     apiFetch("/api/placement")
       .then(async (response) => {
         if (!response.ok) {
@@ -36,7 +64,7 @@ export default function PlacementPage({
       .catch(() => {
         setError("Could not reach the server. Is Laravel running?");
       });
-  }, []);
+  }, [showingResult]);
 
   async function savePlacement(body) {
     setIsSubmitting(true);
@@ -66,20 +94,12 @@ export default function PlacementPage({
     savePlacement({ skip: true });
   }
 
-  function handlePick(option) {
-    if (picked) {
-      return;
-    }
-    setPicked(option);
-  }
-
   function handleNext() {
     const question = questions[index];
     const nextChecks = { ...checks, [question.id]: picked };
 
     if (index + 1 >= questions.length) {
       savePlacement({
-        skip: false,
         self_level: selfLevel,
         checks: nextChecks,
       });
@@ -88,11 +108,14 @@ export default function PlacementPage({
 
     setChecks(nextChecks);
     setIndex((current) => current + 1);
-    setPicked(null);
+    setPicked("");
   }
 
-  const askingSelf = selfLevel === null;
+  const askingSelf = selfLevel === null && !showingResult;
   const question = questions[index];
+  const canContinue =
+    question?.type === "fill" ? picked.trim().length > 0 : picked.length > 0;
+  const result = STAGE_COPY[suggested];
 
   return (
     <div className="page page-guest">
@@ -112,8 +135,8 @@ export default function PlacementPage({
               <p className="eyebrow">Before you start</p>
               <h1>Hujambo, {user.name}. How much Swahili do you already know?</h1>
               <p className="lede">
-                One honest answer, then five short checks. You can skip and
-                start from the beginning.
+                One honest answer, then six short checks. The last two are harder.
+                You can skip and start from Greetings.
               </p>
               <div className="choice-list">
                 {SELF_LEVELS.map((level) => (
@@ -130,29 +153,44 @@ export default function PlacementPage({
             </>
           ) : null}
 
-          {!askingSelf && question ? (
+          {!askingSelf && question && !showingResult ? (
             <>
               <p className="eyebrow">
                 Quick check · {index + 1} / {questions.length}
+                {index >= 4 ? " · tougher" : ""}
               </p>
               <h1>What is the Swahili for “{question.prompt}”?</h1>
-              <div className="choice-list">
-                {question.options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={`choice-btn${picked === option ? " correct" : ""}`}
-                    onClick={() => handlePick(option)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              {picked ? (
+
+              {question.type === "choice" ? (
+                <div className="choice-list">
+                  {question.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={`choice-btn${picked === option ? " correct" : ""}`}
+                      onClick={() => setPicked(option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <label>
+                  Type your answer
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    value={picked}
+                    onChange={(event) => setPicked(event.target.value)}
+                  />
+                </label>
+              )}
+
+              {canContinue ? (
                 <button type="button" onClick={handleNext} disabled={isSubmitting}>
                   {index + 1 >= questions.length
                     ? isSubmitting
-                      ? "Saving…"
+                      ? "Checking…"
                       : "See my path"
                     : "Next"}
                 </button>
@@ -160,16 +198,63 @@ export default function PlacementPage({
             </>
           ) : null}
 
-          <p className="switch">
-            <button
-              type="button"
-              className="link"
-              onClick={handleSkip}
-              disabled={isSubmitting}
-            >
-              Skip — start from Greetings
-            </button>
-          </p>
+          {showingResult && result ? (
+            <>
+              <p className="eyebrow">Your path</p>
+              <h1>We suggest {result.title}.</h1>
+              <p className="lede">{result.lede}</p>
+              <div className="actions">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() =>
+                    savePlacement({
+                      confirm: true,
+                      placement: suggested,
+                    })
+                  }
+                >
+                  Start at {result.title}
+                </button>
+              </div>
+              {LOWER_STAGES[suggested].length > 0 ? (
+                <>
+                  <p className="hint">Or start lower:</p>
+                  <div className="choice-list">
+                    {LOWER_STAGES[suggested].map((stage) => (
+                      <button
+                        key={stage}
+                        type="button"
+                        className="choice-btn"
+                        disabled={isSubmitting}
+                        onClick={() =>
+                          savePlacement({
+                            confirm: true,
+                            placement: stage,
+                          })
+                        }
+                      >
+                        Start at {STAGE_COPY[stage].title} instead
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </>
+          ) : null}
+
+          {!showingResult ? (
+            <p className="switch">
+              <button
+                type="button"
+                className="link"
+                onClick={handleSkip}
+                disabled={isSubmitting}
+              >
+                Skip — start from Greetings
+              </button>
+            </p>
+          ) : null}
         </section>
       </div>
     </div>

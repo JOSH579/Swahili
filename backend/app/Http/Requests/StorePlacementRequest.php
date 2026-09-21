@@ -17,10 +17,17 @@ class StorePlacementRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->boolean('skip') || $this->boolean('confirm')) {
+            return [
+                'skip' => ['sometimes', 'boolean'],
+                'confirm' => ['sometimes', 'boolean'],
+                'placement' => ['required_if:confirm,true', 'in:starter,survival,beyond'],
+            ];
+        }
+
         return [
-            'skip' => ['sometimes', 'boolean'],
-            'self_level' => ['required_unless:skip,true', 'in:none,some,lots'],
-            'checks' => ['required_unless:skip,true', 'array'],
+            'self_level' => ['required', 'in:none,some,lots'],
+            'checks' => ['required', 'array'],
             'checks.*' => ['string'],
         ];
     }
