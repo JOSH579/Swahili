@@ -365,7 +365,7 @@ button.secondary {
 .choice-btn.wrong {
   background: #f8e6e6;
   color: var(--danger);
-  border-color: var(--danger);
+  border-color: var(--danger);              
 }
 
 .card .preview-heading {
