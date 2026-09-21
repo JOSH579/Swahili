@@ -9,7 +9,7 @@ const HOME_COPY = {
   },
   survival: {
     eyebrow: "Survival Swahili",
-    lede: "You already know some basics. Review Greetings, or wait for the next unit.",
+    lede: "You already know some basics. Introduction is next; Greetings sits under Review.",
   },
   beyond: {
     eyebrow: "You are ahead",

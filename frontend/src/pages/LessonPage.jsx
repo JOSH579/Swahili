@@ -12,8 +12,12 @@ function isClose(heard, expected) {
   return a === b || a.includes(b) || b.includes(a);
 }
 
+function clipFile(swahili) {
+  return swahili.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 function clipPath(slug, swahili) {
-  return `/audio/${slug}/${swahili.toLowerCase()}.mp3`;
+  return `/audio/${slug}/${clipFile(swahili)}.mp3`;
 }
 
 export default function LessonPage({

@@ -31,7 +31,8 @@ class LessonTest extends TestCase
             ->assertOk()
             ->assertJsonPath('up_next.0.title', 'Greetings')
             ->assertJsonPath('up_next.0.word_count', 9)
-            ->assertJsonCount(0, 'review');
+            ->assertJsonCount(0, 'review')
+            ->assertJsonCount(1, 'up_next');
     }
 
     public function test_authenticated_user_can_view_a_lesson(): void
@@ -73,7 +74,7 @@ class LessonTest extends TestCase
         $this->assertContains($question['answer'], $question['options']);
     }
 
-    public function test_survival_user_sees_greetings_as_review(): void
+    public function test_survival_user_sees_introductions_next(): void
     {
         $this->seed(LessonSeeder::class);
 
@@ -86,7 +87,8 @@ class LessonTest extends TestCase
             'Authorization' => "Bearer {$token}",
         ])
             ->assertOk()
-            ->assertJsonCount(0, 'up_next')
+            ->assertJsonPath('up_next.0.title', 'Introductions')
+            ->assertJsonPath('up_next.0.word_count', 9)
             ->assertJsonPath('review.0.title', 'Greetings');
     }
 }
