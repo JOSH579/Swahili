@@ -371,3 +371,19 @@ button.secondary {
 .card .preview-heading {
   margin: 20px 0 8px;
 }
+
+.word-row {
+  align-items: flex-start;
+}
+
+.word-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.word-actions button {
+  margin-top: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+}
