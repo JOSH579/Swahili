@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
 import GuestNav from "../components/GuestNav.jsx";
 import { apiFetch } from "../api.js";
+import { useEffect, useRef, useState } from "react";
 
 function normalize(text) {
   return text.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function isBlankHeard(text) {
+  return normalize(text).replace(/[.\u2026…,!?'"-]+/g, "").trim() === "";
 }
 
 function isClose(heard, expected) {
@@ -32,6 +36,7 @@ export default function LessonPage({
   const [error, setError] = useState("");
   const [status, setStatus] = useState({});
   const [busyId, setBusyId] = useState(null);
+  const sessionRef = useRef(null);
 
   useEffect(() => {
     apiFetch(`/api/lessons/${lessonId}`)
@@ -59,67 +64,125 @@ export default function LessonPage({
     });
   }
 
-  async function handleSpeak(word) {
-    setBusyId(word.id);
-    setWordStatus(word.id, "Listening…");
-
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
-
-      const blob = await new Promise((resolve, reject) => {
+  async function startSpeak(word) {
+      if (sessionRef.current) {
+        return;
+      }
+    
+      setBusyId(word.id);
+      setWordStatus(word.id, "Hold and speak…");
+    
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
+    
         recorder.ondataavailable = (event) => {
           if (event.data.size) {
             chunks.push(event.data);
           }
         };
-        recorder.onerror = () => reject(new Error("recorder"));
-        recorder.onstop = () => resolve(new Blob(chunks, { type: recorder.mimeType }));
+    
+        const startedAt = Date.now();
+        const maxTimer = window.setTimeout(() => stopSpeak(), 8000);
+    
         recorder.start();
-        window.setTimeout(() => recorder.stop(), 3000);
-      });
-
-      stream.getTracks().forEach((track) => track.stop());
-      setWordStatus(word.id, "Checking…");
-
-      const body = new FormData();
-      body.append("file", blob, "clip.webm");
-
-      const response = await fetch("/speech/transcribe", {
-        method: "POST",
-        body,
-      });
-
-      if (!response.ok) {
-        setWordStatus(word.id, "Speech service is not running. Start uvicorn.");
+        sessionRef.current = { word, stream, recorder, chunks, startedAt, maxTimer };
+      } catch {
+        setBusyId(null);
+        setWordStatus(
+          word.id,
+          "Microphone blocked. Allow the mic, and keep uvicorn running."
+        );
+      }
+    }
+    
+    function stopSpeak() {
+      const session = sessionRef.current;
+      if (!session) {
         return;
       }
-
-      const payload = await response.json();
-      const heard = payload.text || "";
-
-      if (!heard) {
-        setWordStatus(word.id, "I did not catch that. Try again.");
+      sessionRef.current = null;
+      window.clearTimeout(session.maxTimer);
+    
+      if (session.recorder.state === "recording") {
+        session.recorder.onstop = () => {
+          session.stream.getTracks().forEach((track) => track.stop());
+          const blob = new Blob(session.chunks, { type: session.recorder.mimeType });
+          finishSpeak(session.word, blob, Date.now() - session.startedAt);
+        };
+        session.recorder.stop();
         return;
       }
-
-      if (isClose(heard, word.swahili)) {
-        setWordStatus(word.id, `Heard “${heard}” — close enough.`);
-      } else {
-        setWordStatus(word.id, `Heard “${heard}”. Expected ${word.swahili}.`);
-      }
-    } catch {
-      stream?.getTracks().forEach((track) => track.stop());
-      setWordStatus(
-        word.id,
-        "Microphone blocked or speech service down. Allow the mic, and keep uvicorn running."
-      );
-    } finally {
+    
+      session.stream.getTracks().forEach((track) => track.stop());
       setBusyId(null);
     }
-  }
+    
+    async function finishSpeak(word, blob, durationMs) {
+      if (durationMs < 400) {
+        setWordStatus(word.id, "Hold Speak while you talk, then release.");
+        setBusyId(null);
+        return;
+      }
+    
+      setWordStatus(word.id, "Checking…");
+    
+      try {
+        const body = new FormData();
+        body.append("file", blob, "clip.webm");
+    
+        const response = await fetch("/speech/transcribe", {
+          method: "POST",
+          body,
+        });
+    
+        if (!response.ok) {
+          setWordStatus(word.id, "Speech service is not running. Start uvicorn.");
+          return;
+        }
+    
+        const payload = await response.json();
+        const heard = payload.text || "";
+    
+        if (!heard || isBlankHeard(heard)) {
+          setWordStatus(word.id, "I did not catch that. Try again.");
+          return;
+        }
+    
+        const passed = isClose(heard, word.swahili);
+    
+        if (passed) {
+          setWordStatus(word.id, `Heard “${heard}” — close enough.`);
+        } else {
+          setWordStatus(word.id, `Heard “${heard}”. Expected ${word.swahili}.`);
+        }
+    
+        const save = await apiFetch(`/api/vocab-items/${word.id}/spoken`, {
+          method: "POST",
+          body: JSON.stringify({ heard }),
+        });
+    
+        if (save.ok) {
+          const saved = await save.json();
+          setLesson((current) => ({
+            ...current,
+            words: current.words.map((item) =>
+              item.id === word.id
+                ? { ...item, spoken: saved.spoken.passed }
+                : item
+            ),
+          }));
+        }
+      } catch {
+        setWordStatus(
+          word.id,
+          "Could not check that clip. Is the speech service running?"
+        );
+      } finally {
+        setBusyId(null);
+      }
+    }
 
   return (
     <div className="page page-guest">
@@ -141,9 +204,13 @@ export default function LessonPage({
               <p className="lede">{lesson.description}</p>
               <ul className="word-list">
                 {lesson.words.map((word) => (
-                  <li key={word.id} className="word-row">
+                  <li key={word.id} 
+                  className={word.spoken ? "word-row said" : "word-row"}>
                     <div>
-                      <strong>{word.swahili}</strong>
+                      <strong>
+                        {word.swahili}
+                        {word.spoken ? " . Said" : ""}
+                      </strong>
                       <p className="hint">{word.english}</p>
                       {status[word.id] ? (
                         <p className="hint">{status[word.id]}</p>
@@ -155,10 +222,16 @@ export default function LessonPage({
                       </button>
                       <button
                         type="button"
-                        disabled={busyId === word.id}
-                        onClick={() => handleSpeak(word)}
+                        className="speak-btn"
+                        disabled={busyId !== null && busyId !== word.id}
+                        onPointerDown={(event) => {
+                          event.preventDefault();
+                          startSpeak(word);
+                        }}
+                        onPointerUp={stopSpeak}
+                        onPointerCancel={stopSpeak}
                       >
-                        {busyId === word.id ? "…" : "Speak"}
+                        {busyId === word.id ? "Listening…" : "Hold to speak"}
                       </button>
                     </div>
                   </li>

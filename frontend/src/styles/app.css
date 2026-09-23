@@ -274,10 +274,36 @@ button.secondary {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
+  transition: width 0.28s ease;
 }
 
 .sidebar.open {
   width: 220px;
+}
+
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar.open .sidebar-panel {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition-delay: 0.06s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-panel {
+    transition: none;
+  }
 }
 
 .nav-toggle {
@@ -386,4 +412,13 @@ button.secondary {
   margin-top: 0;
   padding: 8px 12px;
   font-size: 13px;
+}
+
+.word-row.said strong {
+  color: var(--accent);
+}
+
+.speak-btn {
+  touch-action: none;
+  user-select: none;
 }

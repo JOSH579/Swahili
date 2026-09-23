@@ -18,44 +18,45 @@ export default function GuestNav({
         {open ? "Close" : "Menu"}
       </button>
 
-      {open ? (
-        <>
-          <button type="button" className="brand" onClick={onGoHome}>
-            Karibu
+      <div className="sidebar-panel" aria-hidden={!open}>
+        <button type="button" className="brand" onClick={onGoHome} tabIndex={open ? 0 : -1}>
+          Karibu
+        </button>
+        <nav className="site-nav" aria-label="Main">
+          <button
+            type="button"
+            className={current === "landing" || current === "home" ? "nav-btn active" : "nav-btn"}
+            onClick={onGoHome}
+            tabIndex={open ? 0 : -1}
+          >
+            Home
           </button>
-          <nav className="site-nav" aria-label="Main">
-            <button
-              type="button"
-              className={current === "landing" || current === "home" ? "nav-btn active" : "nav-btn"}
-              onClick={onGoHome}
-            >
-              Home
+          {onLogout ? (
+            <button type="button" className="nav-btn" onClick={onLogout} tabIndex={open ? 0 : -1}>
+              Log out
             </button>
-            {onLogout ? (
-              <button type="button" className="nav-btn" onClick={onLogout}>
-                Log out
+          ) : (
+            <>
+              <button
+                type="button"
+                className={current === "login" ? "nav-btn active" : "nav-btn"}
+                onClick={onGoToLogin}
+                tabIndex={open ? 0 : -1}
+              >
+                Log in
               </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className={current === "login" ? "nav-btn active" : "nav-btn"}
-                  onClick={onGoToLogin}
-                >
-                  Log in
-                </button>
-                <button
-                  type="button"
-                  className={current === "register" ? "nav-btn active" : "nav-btn"}
-                  onClick={onGoToRegister}
-                >
-                  Register
-                </button>
-              </>
-            )}
-          </nav>
-        </>
-      ) : null}
+              <button
+                type="button"
+                className={current === "register" ? "nav-btn active" : "nav-btn"}
+                onClick={onGoToRegister}
+                tabIndex={open ? 0 : -1}
+              >
+                Register
+              </button>
+            </>
+          )}
+        </nav>
+      </div>
     </aside>
   );
 }

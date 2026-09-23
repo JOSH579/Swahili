@@ -47,7 +47,8 @@ class LessonTest extends TestCase
         ])
             ->assertOk()
             ->assertJsonPath('lesson.words.0.swahili', 'Hujambo')
-            ->assertJsonPath('lesson.words.0.english', 'Hello');
+            ->assertJsonPath('lesson.words.0.english', 'Hello')
+            ->assertJsonPath('lesson.words.0.spoken', false);
     }
 
     public function test_quiz_requires_a_token(): void

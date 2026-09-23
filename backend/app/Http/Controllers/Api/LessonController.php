@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Models\SpokenWord;
 
 class LessonController extends Controller
 {
@@ -43,9 +44,15 @@ class LessonController extends Controller
         ]);
     }
 
-    public function show(Lesson $lesson): JsonResponse
+    public function show(Request $request, Lesson $lesson): JsonResponse
     {
         $lesson->load('vocabItems');
+
+        $spoken = SpokenWord::query()
+            ->where('user_id', $request->user()->id)
+            ->whereIn('vocab_item_id', $lesson->vocabItems->pluck('id'))
+            ->get()
+            ->keyBy('vocab_item_id');
 
         return response()->json([
             'lesson' => [
@@ -57,6 +64,7 @@ class LessonController extends Controller
                     'id' => $word->id,
                     'swahili' => $word->swahili,
                     'english' => $word->english,
+                    'spoken' => (bool) ($spoken[$word->id]->passed ?? false),
                 ]),
             ],
         ]);
