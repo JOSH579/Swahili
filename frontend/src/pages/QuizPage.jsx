@@ -83,7 +83,7 @@ export default function QuizPage({
               <p className="eyebrow">
                 {quiz.title} · {index + 1} / {quiz.questions.length}
               </p>
-              <h1>What is the Swahili for “{question.prompt}”?</h1>
+              <h1>What is the Swahili word for “{question.prompt}”?</h1>
               <div className="choice-list">
                 {question.options.map((option) => {
                   let extra = "";

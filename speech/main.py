@@ -18,7 +18,12 @@ async def transcribe(file: UploadFile = File(...)) -> dict:
         tmp.write(await file.read())
         tmp_path = tmp.name
 
-    segments, _info = model.transcribe(tmp_path, language="sw")
+    segments, _info = model.transcribe(
+        tmp_path,
+        language="sw",
+        vad_filter=True,
+        vad_parameters={"min_silence_duration_ms": 500},
+    )
     text = " ".join(segment.text for segment in segments).strip()
     Path(tmp_path).unlink(missing_ok=True)
     return {"text": text}
